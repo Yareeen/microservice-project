@@ -1,0 +1,156 @@
+GET http://localhost:8080/message
+
+<> 2023-08-27T234706.400.json
+
+###
+
+GET http://localhost:8081/stomp
+
+<> 2023-08-27T234655.500.json
+
+###
+
+GET http://localhost:8080
+
+<> 2023-08-27T234639.404.json
+
+###
+
+GET http://localhost:8081
+
+<> 2023-08-27T234631.404.json
+
+###
+
+GET http://localhost:8081
+
+<> 2023-08-27T234354.404.json
+
+###
+
+GET http://localhost:8080
+
+<> 2023-08-27T234348.404.json
+
+###
+
+GET http://localhost:8081
+
+<> 2023-08-27T234254.404.json
+
+###
+
+GET http://localhost:8081/stomp
+
+<> 2023-08-27T234244.500.json
+
+###
+
+GET http://localhost:8080/stomp
+
+<> 2023-08-27T234239.404.json
+
+###
+
+GET http://localhost:8081/stomp
+
+<> 2023-08-27T234232.500.json
+
+###
+
+GET http://localhost:9000
+
+<> 2023-08-27T234120.200.html
+
+###
+
+GET http://localhost:8080
+
+<> 2023-08-27T234116.404.json
+
+###
+
+GET http://localhost:8081
+
+<> 2023-08-27T234112.404.json
+
+###
+
+GET http://localhost:8081
+
+<> 2023-08-27T233747.404.json
+
+###
+
+GET http://localhost:8080
+
+<> 2023-08-27T233743.404.json
+
+###
+
+GET http://localhost:8080
+
+<> 2023-08-27T233657.404.json
+
+###
+
+GET http://localhost:8081
+
+<> 2023-08-27T233651.404.json
+
+###
+
+GET http://localhost:8081
+
+<> 2023-08-27T233647.404.json
+
+###
+
+GET http://localhost:8081/home
+
+<> 2023-08-27T233639.404.json
+
+###
+
+GET http://localhost:8080/home
+
+<> 2023-08-27T233635.404.json
+
+###
+
+GET http://localhost:8080/message
+
+<> 2023-08-27T233127.400.json
+
+###
+
+GET http://localhost:8081/user
+
+<> 2023-08-27T233122.400.txt
+
+###
+
+GET http://localhost:8080/user
+
+<> 2023-08-27T233117.404.json
+
+###
+
+GET http://localhost:8081/user
+
+<> 2023-08-27T233015.400.txt
+
+###
+
+GET http://localhost:8081/message
+
+<> 2023-08-27T233001.404.json
+
+###
+
+GET http://localhost:8081/message
+
+<> 2023-08-27T232952.404.json
+
+###
+

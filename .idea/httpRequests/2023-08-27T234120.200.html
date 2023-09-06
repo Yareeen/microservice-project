@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kafdrop: Broker List</title>
+    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/css/font-awesome.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/css/global.css"/>
+
+    <script src="/js/jquery-3.5.1.slim.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/global.js"></script>
+    <script async defer src="/js/github-buttons.js"></script>
+
+</head>
+<body>
+
+<div class="pb-2 mt-5 mb-4 border-bottom border-secondary">
+    <div class="container">
+        <div class="container-fluid pl-0">
+            <div id="header-title-line" class="row">
+                <div id="logo" class="col-md-1">
+                    <img alt="logo" height="100%" src="/images/kafdrop-logo.svg"/>
+                </div>
+                <div id="title" class="col-md-10">
+                    <h1 class="app-name brand mb-0">
+                        <a href="/">Kafdrop</a>
+                    </h1>
+                </div>
+                <div id="github-star" class="col-md-1">
+                    <a class="github-button" href="https://github.com/obsidiandynamics/kafdrop" data-show-count="false"
+                       aria-label="Star Kafdrop on GitHub" data-color-scheme="dark">Star</a>
+                </div>
+                <script>
+                    $(document).ready(function () {
+                        setTimeout(function () {
+                            restyle(0);
+                        });
+                    });
+
+                    function restyle(retries) {
+                        var githubStarSpan = document.querySelector('#github-star span');
+                        if (githubStarSpan != null) {
+                            var shadowRoot = githubStarSpan.shadowRoot;
+                            shadowRoot.querySelector('.btn')
+                                .setAttribute('style', 'color:#00f0fe; background-image:none; background-color:#222; border-color:#222');
+                            shadowRoot.querySelector('.social-count')
+                                .setAttribute('style', 'color:#222; background-image:none; background-color:#00f0fe; border-color:#00f0fe');
+                            shadowRoot.querySelector('.social-count b')
+                                .setAttribute('style', 'border-right-color:#00f0fe');
+                            shadowRoot.querySelector('.social-count i')
+                                .setAttribute('style', 'border-right-color:#00f0fe');
+                        } else {
+                            setTimeout(function () {
+                                restyle(retries + 1);
+                            }, retries * 10);
+                        }
+                    }
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+
+    <script src="/js/powerFilter.js"></script>
+
+
+    <div>
+        <div id="kafdropVersion">3.31.0 [2023-03-20T17:07:14.026Z]</div>
+
+        <h2>Kafka Cluster Overview</h2>
+        <div id="cluster-overview">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <td><i class="fa fa-server"></i>&nbsp;&nbsp;Bootstrap servers</td>
+                    <td>kafka:29092</td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-database"></i>&nbsp;&nbsp;Total topics</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-pie-chart"></i>&nbsp;&nbsp;Total partitions</td>
+                    <td>51</td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-trophy"></i>&nbsp;&nbsp;Total preferred partition leader</td>
+                    <td>100%</td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-heartbeat"></i>&nbsp;&nbsp;Total under-replicated partitions</td>
+                    <td>0</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="brokers">
+            <h3><i class="fa fa-server"></i> Brokers</h3>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th><i class="fa fa-tag"></i>&nbsp;&nbsp;ID</th>
+                    <th><i class="fa fa-laptop"></i>&nbsp;&nbsp;Host</th>
+                    <th><i class="fa fa-plug"></i>&nbsp;&nbsp;Port</th>
+                    <th><i class="fa fa-server"></i>&nbsp;&nbsp;Rack</th>
+                    <th><i class="fa fa-trophy"></i>&nbsp;&nbsp;Controller</th>
+                    <th>
+                        <i class="fa fa-pie-chart"></i>&nbsp;&nbsp;Number of partitions (% of total)
+                        <a title="# of partitions this broker is the leader for"
+                           data-toggle="tooltip" data-placement="top" href="#">
+                            <i class="fa fa-question-circle"></i>
+                        </a>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><a href="/broker/1"><i class="fa fa-info-circle fa-lg"></i> 1</a></td>
+                    <td>kafka</td>
+                    <td>29092</td>
+                    <td>-</td>
+                    <td> Yes
+                    </td>
+                    <td>51
+                        (100%)
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="topics">
+            <h3><i class="fa fa-database"></i> Topics&nbsp;&nbsp;&nbsp;<a href="/acl"><i class="fa fa-lock"></i>
+                ACLs</a></h3>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>
+                        Name
+
+                        <span style="font-weight:normal;">
+                            &nbsp;<INPUT id='filter' size=25 NAME='searchRow' title='Just type to filter the rows'>&nbsp;
+                        <span id="rowCount"></span>
+                    </span>
+                    </th>
+                    <th>
+                        Partitions
+                        <a title="Number of partitions in the topic"
+                           data-toggle="tooltip" data-placement="top" href="#"
+                        ><i class="fa fa-question-circle"></i></a>
+                    </th>
+                    <th>
+                        % Preferred
+                        <a title="Percent of partitions where the preferred broker has been assigned leadership"
+                           data-toggle="tooltip" data-placement="top" href="#"
+                        ><i class="fa fa-question-circle"></i></a>
+                    </th>
+                    <th>
+                        # Under-replicated
+                        <a title="Number of partition replicas that are not in sync with the primary partition"
+                           data-toggle="tooltip" data-placement="top" href="#"
+                        ><i class="fa fa-question-circle"></i></a>
+                    </th>
+                    <th>Custom Config</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="dataRow">
+                    <td><a href="/topic/__consumer_offsets">__consumer_offsets</a></td>
+                    <td>50</td>
+                    <td>100%</td>
+                    <td>0</td>
+                    <td> Yes
+                    </td>
+                </tr>
+                <tr class="dataRow">
+                    <td><a href="/topic/t.location">t.location</a></td>
+                    <td>1</td>
+                    <td>100%</td>
+                    <td>0</td>
+                    <td> No
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <a class="btn btn-outline-light" href="/topic/create">
+                <i class="fa fa-plus"></i> New
+            </a>
+        </div>
+    </div>
+
+</div>
+<div class="pb-0 mt-5 mb-4">
+    <div class="container">
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+        $('#filter').focus();
+
+        $('[data-toggle="tooltip"]').tooltip()
+    });
+</script>
