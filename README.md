@@ -2,6 +2,8 @@
 
 Bu uygulama, Türkiye sınırları içinde rastgele üretilen coğrafi konumları kullanarak interaktif bir harita deneyimi sunmayı amaçlar. Uygulama, hem backend hem de frontend bileşenlerini içerir ve şu temel adımları takip eder:
 
+<img src="Proje_gorsel.gif" width="auto">
+
 ## Backend
 
 1. Backend tarafında, Türkiye sınırları içinde rastgele oluşturulan enlem (latitude) ve boylam (longitude) değerleri kullanılır. Bu konum bilgileri, coğrafi konumları temsil eder.
@@ -19,3 +21,6 @@ Bu uygulama, Türkiye sınırları içinde rastgele üretilen coğrafi konumlar�
 3. Bu polyline kodlandığında, bir dizi "waypoints" (rota noktaları) elde edilir. "startloc" ve "endloc" bilgileri ile birlikte bu "waypoints" bilgileri WebSocket aracılığıyla Kafka'ya geri gönderilir ve bu bilgiler frontend tarafından alınır.
 
 4. Kullanıcı, hangi aracın butonuna tıkladıysa, o aracın başlangıç ve bitiş noktalarını harita üzerinde görebilir. Ayrıca, "startloc" ve "endloc" noktalarına göre gelen waypoints'e dayalı olarak rota üzerinde hareket eden bir işaretçi (marker) görüntülenir.
+
+
+
