@@ -19,3 +19,6 @@ Bu uygulama, Türkiye sınırları içinde rastgele üretilen coğrafi konumlar�
 3. Bu polyline kodlandığında, bir dizi "waypoints" (rota noktaları) elde edilir. "startloc" ve "endloc" bilgileri ile birlikte bu "waypoints" bilgileri WebSocket aracılığıyla Kafka'ya geri gönderilir ve bu bilgiler frontend tarafından alınır.
 
 4. Kullanıcı, hangi aracın butonuna tıkladıysa, o aracın başlangıç ve bitiş noktalarını harita üzerinde görebilir. Ayrıca, "startloc" ve "endloc" noktalarına göre gelen waypoints'e dayalı olarak rota üzerinde hareket eden bir işaretçi (marker) görüntülenir.
+
+
+<img src="[gorsel-link](https://github.com/Yareeen/microservice-project/blob/master/Proje_gorsel.gif)https://github.com/Yareeen/microservice-project/blob/master/Proje_gorsel.gif" width="auto">
