@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebSocket</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYZZ8iVmfZS5diM-pOFXL__2wG2YdtbQ4&callback=initMap"></script>
+  </head>
+  <body>
+    <button id="connect" onclick="toggleConnect()">Connect</button>
+    <button id="disconnect" onclick="disconnect()" disabled>Disconnect</button>
+    <div id="conversationDiv" style="visibility: hidden">
+      <div id="response"></div>
+    </div>
+    <div style="display: flex">
+      <div style="width: 30%; height: 400px">
+        <div id="vehicle">
+          <div id="vehicleTable">
+            <table>
+              <thead>
+                <tr>
+                  <th>Araçlar</th>
+                  <th>Başlangıç Konumu</th>
+                  <th>Varış Konumu</th>
+                  <th>Yol Göster</th>
+                  <th>Yol</th>
+                </tr>
+              </thead>
+              <tbody id="vehicleList">
+                <!-- Araçlar dinamik olarak buraya eklenecek -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="map" style="width: 80%; height: 500px"></div>
+    </div>
+
+    <script type="text/javascript">
+      var stompClientLocation = null;
+      var stompClientWaypoints = null;
+      var baseAddress = "http://localhost:8081";
+      var markerPositions = [];
+      var markers = [];
+      /*{
+        wp1: [],
+
+        wp2: []
+
+      }*/
+      var directionsService = new google.maps.DirectionsService();
+      var directionsRenderer;
+      var map;
+
+      var connected = false;
+
+      function initMap() {
+        const { Map, Marker } = google.maps;
+
+        map = new Map(document.getElementById("map"), {
+          center: { lat: 39.397, lng: 35.644 },
+          zoom: 6,
+        });
+
+        directionsRenderer = new google.maps.DirectionsRenderer();
+        directionsRenderer.setMap(map);
+      }
+
+      function setConnected(connected) {
+        document.getElementById("connect").disabled = connected;
+        document.getElementById("disconnect").disabled = !connected;
+        document.getElementById("conversationDiv").style.visibility = connected
+          ? "visible"
+          : "hidden";
+        document.getElementById("response").innerHTML = "";
+      }
+
+      function toggleConnect() {
+        if (connected) {
+          disconnect();
+        } else {
+          connect();
+        }
+      }
+
+      function connect() {
+        var socketLocation = new SockJS(baseAddress + "/location");
+        stompClientLocation = Stomp.over(socketLocation);
+        stompClientLocation.connect({}, function (frame) {
+          connected = true;
+          setConnected(true);
+          stompClientLocation.subscribe("/topic", function (message) {
+            handleReceivedLocationMessage(message.body);
+          });
+        });
+
+        var socketWaypoints = new SockJS(baseAddress + "/waypoints/ws");
+        stompClientWaypoints = Stomp.over(socketWaypoints);
+        stompClientWaypoints.connect({}, function (frame) {
+          setConnected(true);
+          stompClientWaypoints.subscribe("/topic", function (receivedMessage) {
+            waypointsmessage(receivedMessage.body);
+          });
+        });
+      }
+
+      function disconnect() {
+        if (stompClientLocation !== null) {
+          stompClientLocation.unsubscribe();
+          stompClientLocation.disconnect();
+        }
+        if (stompClientWaypoints !== null) {
+          stompClientWaypoints.unsubscribe();
+          stompClientWaypoints.disconnect();
+        }
+        connected = false;
+        setConnected(false);
+        console.log("Disconnected");
+      }
+
+      function handleReceivedLocationMessage(message) {
+        console.log("Received location message:", message);
+        try {
+          const latLngData = JSON.parse(message);
+
+          const endPosition = new google.maps.LatLng(
+            latLngData.endloc.lat,
+            latLngData.endloc.lng
+          );
+
+          const newPosition = new google.maps.LatLng(
+            latLngData.startloc.lat,
+            latLngData.startloc.lng
+          );
+
+          var request = {
+            origin: { lat: newPosition.lat(), lng: newPosition.lng() },
+            destination: { lat: endPosition.lat(), lng: endPosition.lng() },
+            travelMode: "DRIVING",
+          };
+
+          directionsService.route(request, function (result, status) {
+            if (status == "OK") {
+              //directionsRenderer.setDirections(result);
+              const encodedPolyline = result.routes[0].overview_polyline;
+              const decodedPath =
+                google.maps.geometry.encoding.decodePath(encodedPolyline);
+              const waypoints = JSON.stringify(decodedPath);
+              const waypointsobj = JSON.parse(waypoints);
+
+              try {
+                if (latLngData.id) {
+                  const messageToSend = {
+                    startloc: latLngData.startloc,
+                    endloc: latLngData.endloc,
+                    waypoints: waypoints,
+                  };
+                  stompClientWaypoints.send(
+                    "/waypoints/ws",
+                    {},
+                    JSON.stringify(messageToSend)
+                  );
+                }
+              } catch (error) {
+                return;
+              }
+            }
+          });
+        } catch (error) {
+          console.error("JSON ayrıştırma hatası:", error);
+        }
+      }
+
+      let j = 1;
+      let currentMarker; // Mevcut marker'ı saklar
+      let currentTimeout; // Geçerli setTimeout'i saklar
+
+      function waypointsmessage(receivedMessage) {
+        const latLngData = JSON.parse(receivedMessage);
+        const waypoints = latLngData.waypoints;
+
+        var vehicleDiv = document.getElementById("vehicle");
+        if (latLngData.waypoints != null) {
+          var messageDiv = document.createElement("div");
+          var directionButton = document.createElement("button");
+          directionButton.textContent = `Araç ${j} Yol Göster`;
+          var currentMarkerIndex = 0;
+          var wp = JSON.parse(waypoints);
+            currentMarkerIndex = 0; // Şu anki yol noktasının dizinini takip etmek için
+
+            function moveMarker() {
+              if (currentMarkerIndex < wp.length) {
+                // Hala daha fazla yol noktası varsa devam et
+                console.log(wp[currentMarkerIndex]);
+                var nextWaypoint = wp[currentMarkerIndex];
+                var nextPosition = new google.maps.LatLng(
+                  nextWaypoint.lat,
+                  nextWaypoint.lng
+                );
+
+                // Mevcut marker'ın pozisyonunu güncelle
+                if (currentMarker) {
+                  currentMarker.setPosition(nextPosition);
+                } else {
+                  // İlk adımda marker yoksa, yeni marker oluştur
+                  currentMarker = new google.maps.Marker({
+                    position: nextPosition,
+                    map: map,
+                    icon: {
+                      url: "araba.png",
+                      scaledSize: new google.maps.Size(36, 36),
+                    },
+                  });
+                }
+
+                // Şu anki dizini artır
+                currentMarkerIndex++;
+
+                // Belirli bir süre sonra bir sonraki adıma git
+                if (currentMarkerIndex < wp.length) {
+                  currentTimeout = setTimeout(moveMarker, 1000); // Örneğin, 2 saniyede bir güncelle
+                }
+              }
+            }
+            
+          directionButton.onclick = function () {
+            clearTimeout(currentTimeout);
+
+            showDirection(latLngData.startloc, latLngData.endloc);
+
+            //moveMarker'ı çağırdım
+            moveMarker();
+          };
+
+          messageDiv.appendChild(
+            document.createTextNode(
+              `Araç ${j}\n Başlangıç Konumu: ${JSON.stringify(
+                latLngData.startloc
+              )}`
+            )
+          );
+
+          messageDiv.appendChild(directionButton);
+
+          vehicleDiv.appendChild(messageDiv);
+          j++;
+        }
+      }
+
+      // 'directionsService' ve 'directionsRenderer' nesnelerini tanımlayın ve yapılandırın
+      var directionsService = new google.maps.DirectionsService();
+      var directionsRenderer = new google.maps.DirectionsRenderer();
+
+      function showDirection(startloc, endloc) {
+        var request = {
+          origin: startloc,
+          destination: endloc,
+          travelMode: "DRIVING",
+        };
+
+        directionsService.route(request, function (result, status) {
+          if (status == "OK") {
+            directionsRenderer.setDirections(result);
+          }
+        });
+      }
+      initMap();
+    </script>
+  </body>
+</html>
