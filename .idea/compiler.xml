@@ -19,7 +19,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="consumer" options="-parameters" />
       <module name="consumer-websocket" options="-parameters" />
-      <module name="kafka-produce" options="" />
+      <module name="kafka-produce" options="-parameters" />
     </option>
   </component>
 </project>
